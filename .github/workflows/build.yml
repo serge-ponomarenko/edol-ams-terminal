@@ -34,6 +34,7 @@ jobs:
           mkdir dist
 
           cp web/index.html dist/
+          cp web/logo.png dist/
           cp web/manifest.json dist/
 
           cp .pio/build/esp32dev/firmware.bin dist/
