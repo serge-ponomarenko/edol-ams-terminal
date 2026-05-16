@@ -70,20 +70,31 @@ The device depends on EDOL AMS APIs for:
 
 ---
 
+## ESP32-2432S028R (Cheap Yellow Display) Pinout
+
+![ESP32-2432S028R Pinout](docs/images/ESP32-2432S028_Pinout.jpg)
+
+---
+
+## PN532 NFC Module Pinout
+
+![PN532 Pinout](docs/images/PN532_Pinout.jpg)
+
+---
+
 ## Wiring Diagram
 
-> TODO: Add wiring image / schematic.
+![EDOL Terminal Connection Diagram](docs/images/EDOL_Terminal_Connection_Diagram.jpg)
 
-### Example Pin Mapping
+### Example Pin Mapping for I2C connection
 
 | Component      | ESP32 Pin |
 | -------------- | --------- |
-| PN532 SDA / SS | TODO      |
-| PN532 SCK      | TODO      |
-| PN532 MOSI     | TODO      |
-| PN532 MISO     | TODO      |
-| PN532 RST      | TODO      |
-| PN532 IRQ      | TODO      |
+| PN532 SDA      | GPIO 27   |
+| PN532 SCL      | GPIO 22   |
+| PN532 VCC      | 3.3 V     |
+| PN532 GND      | GND       |
+
 
 ---
 
@@ -201,7 +212,13 @@ The Home Screen displays:
 
 ---
 
-## Assigning Spool to AMS
+## Assigning Spool to AMS (Automatic mode)
+
+1. Scan spool NFC tag
+2. Insert spool into desired slot
+3. Wait until EDOL AMS recognize slot
+
+## Assigning Spool to AMS (Manual mode)
 
 1. Scan spool NFC tag
 2. Tap staging panel
@@ -286,6 +303,8 @@ The Home Screen displays:
 * [https://platformio.org/](https://platformio.org/)
 
 ## ESP32
+
+* [https://mischianti.org/esp32-2432s028-cheap-yellow-display-high-resolution-pinout-datasheet-schema-and-specs/](ESP32-2432S028 (Cheap Yellow Display): high-resolution pinout, datasheet, schema and specs)
 
 * [https://www.espressif.com/en/products/socs/esp32](https://www.espressif.com/en/products/socs/esp32)
 
