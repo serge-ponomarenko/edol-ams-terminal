@@ -572,24 +572,56 @@ void SlotCardV2::setSpool(
 
         // SLOT
 
-        lv_label_set_text(
-            slotLabel,
-            spool->slot.c_str());
+        if (spool->isActive)
+        {
 
-        lv_obj_set_style_bg_opa(
-            slotContainer,
-            LV_OPA_TRANSP,
-            0);
+            lv_obj_set_style_bg_opa(
+                slotContainer,
+                LV_OPA_COVER,
+                0);
 
-        lv_obj_set_style_border_width(
-            slotContainer,
-            0,
-            0);
+            lv_obj_set_style_bg_color(
+                slotContainer,
+                lv_color_white(),
+                0);
 
-        lv_obj_set_style_text_color(
-            slotLabel,
-            textColor,
-            0);
+            lv_obj_set_style_border_width(
+                slotContainer,
+                1,
+                0);
+
+            lv_obj_set_style_border_color(
+                slotContainer,
+                lv_color_black(),
+                0);
+
+            lv_obj_set_style_text_color(
+                slotLabel,
+                lv_color_black(),
+                0);
+        }
+        else
+        {
+
+            lv_label_set_text(
+                slotLabel,
+                spool->slot.c_str());
+
+            lv_obj_set_style_bg_opa(
+                slotContainer,
+                LV_OPA_TRANSP,
+                0);
+
+            lv_obj_set_style_border_width(
+                slotContainer,
+                0,
+                0);
+
+            lv_obj_set_style_text_color(
+                slotLabel,
+                textColor,
+                0);
+        }
 
         // ID
 

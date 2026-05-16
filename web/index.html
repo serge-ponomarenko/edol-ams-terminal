@@ -1,19 +1,274 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>EDOL AMS Terminal</title>
-</head>
-<body>
-    <h1>EDOL AMS Terminal</h1>
+<html lang="en">
 
-    <script
-        type="module"
-        src="https://unpkg.com/esp-web-tools@9/dist/web/install-button.js">
+<head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>EDOL AMS Terminal</title>
+
+    <script type="module" src="https://unpkg.com/esp-web-tools@9/dist/web/install-button.js">
     </script>
 
-    <esp-web-install-button
-        manifest="manifest.json">
-    </esp-web-install-button>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            background:
+                radial-gradient(circle at top, #16233b 0%, #090909 45%),
+                #090909;
+
+            color: white;
+
+            font-family:
+                Inter,
+                Arial,
+                sans-serif;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 24px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 720px;
+
+            background: rgba(20, 20, 20, 0.85);
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            border-radius: 24px;
+
+            padding: 48px;
+
+            backdrop-filter: blur(12px);
+
+            box-shadow:
+                0 0 60px rgba(0, 140, 255, 0.12),
+                0 0 120px rgba(0, 0, 0, 0.6);
+        }
+
+        .logo {
+            width: 400;
+            max-width: 100%;
+
+            display: block;
+
+            margin: 0 auto 12px auto;
+        }
+
+        h1 {
+            margin: 0;
+
+            text-align: center;
+
+            font-size: 42px;
+            font-weight: 700;
+
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            margin-top: 16px;
+
+            text-align: center;
+
+            color: #b9c1cc;
+
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .badges {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+
+            margin-top: 32px;
+        }
+
+        .badge {
+            padding: 10px 16px;
+
+            border-radius: 999px;
+
+            background: rgba(255, 255, 255, 0.06);
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            font-size: 14px;
+
+            color: #d7dce2;
+        }
+
+        .install-section {
+            margin-top: 48px;
+
+            padding: 32px;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(135deg,
+                    rgba(50, 110, 255, 0.18),
+                    rgba(0, 220, 255, 0.08));
+
+            border: 1px solid rgba(120, 180, 255, 0.2);
+
+            text-align: center;
+        }
+
+        .install-title {
+            font-size: 24px;
+            font-weight: 600;
+
+            margin-bottom: 12px;
+        }
+
+        .install-text {
+            color: #c2cad4;
+
+            margin-bottom: 28px;
+
+            line-height: 1.6;
+        }
+
+        esp-web-install-button::part(button) {
+            background:
+                linear-gradient(135deg,
+                    #4b6fff,
+                    #27d7ff);
+
+            color: white;
+
+            border: none;
+
+            border-radius: 14px;
+
+            font-size: 18px;
+            font-weight: 600;
+
+            padding: 16px 28px;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        esp-web-install-button::part(button):hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 24px rgba(39, 215, 255, 0.25);
+        }
+
+        .footer {
+            margin-top: 40px;
+
+            text-align: center;
+
+            color: #7d8793;
+
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #7fdcff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 32px 24px;
+            }
+
+            h1 {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .install-section {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+
+        <img class="logo" src="logo.png" alt="EDOL Logo" />
+
+        <h1>
+            EDOL AMS Terminal
+        </h1>
+
+        <div class="subtitle">
+            Smart NFC terminal for
+            <a href="https://github.com/serge-ponomarenko/edol" target="_blank">EDOL AMS</a>.<br />
+            Scan, assign and manage filament spools directly from your browser.
+        </div>
+
+        <div class="badges">
+            <div class="badge">
+                ESP32
+            </div>
+
+            <div class="badge">
+                PN532 NFC
+            </div>
+
+            <div class="badge">
+                LVGL UI
+            </div>
+
+            <div class="badge">
+                Works only with EDOL
+            </div>
+        </div>
+
+        <div class="install-section">
+
+            <div class="install-title">
+                Install Firmware
+            </div>
+
+            <div class="install-text">
+                Connect your device using USB and flash the latest firmware directly from your browser.<br />
+                Chrome or Edge browser required.
+            </div>
+
+            <esp-web-install-button manifest="manifest.json">
+            </esp-web-install-button>
+
+        </div>
+
+        <div class="footer">
+            EDOL AMS Terminal • Open Source<br /><br />
+
+            <a href="https://github.com/serge-ponomarenko/edol-ams-terminal" target="_blank">
+                GitHub Repository
+            </a>
+        </div>
+
+    </div>
 </body>
+
 </html>

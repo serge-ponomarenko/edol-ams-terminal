@@ -112,6 +112,10 @@ MakerWorld links:
 
 # Firmware
 
+## Installing over WEB Installation (recommended)
+
+https://serge-ponomarenko.github.io/edol-ams-terminal/
+
 ## Building from Source
 
 ### Requirements
