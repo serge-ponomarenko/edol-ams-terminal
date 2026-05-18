@@ -12,5 +12,8 @@ struct AmsState {
 
     float temperature = 0;
 
+    int currentLayer = 0;
+    int totalLayers = 0;
+
     Spool slots[5];
 };

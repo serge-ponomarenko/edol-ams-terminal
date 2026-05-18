@@ -258,6 +258,21 @@ void HomeScreen::create()
         lv_color_hex(0x4CAF50),
         0);
 
+    infoLayerLabel =
+        lv_label_create(
+            stagingContainer);
+
+    lv_obj_align(
+        infoLayerLabel,
+        LV_ALIGN_LEFT_MID,
+        8,
+        0);
+
+    lv_obj_set_style_text_color(
+        infoLayerLabel,
+        lv_color_white(),
+        0);
+
     infoTempLabel =
         lv_label_create(
             stagingContainer);
@@ -728,6 +743,10 @@ void HomeScreen::refreshCards(lv_timer_t *timer)
             LV_OBJ_FLAG_HIDDEN);
 
         lv_obj_clear_flag(
+            screen->infoLayerLabel,
+            LV_OBJ_FLAG_HIDDEN);
+
+        lv_obj_clear_flag(
             screen->infoTempLabel,
             LV_OBJ_FLAG_HIDDEN);
 
@@ -747,6 +766,26 @@ void HomeScreen::refreshCards(lv_timer_t *timer)
         lv_label_set_text(
             screen->infoAmsLabel,
             "AMS");
+
+        if (state.totalLayers != 0)
+        {
+            snprintf(
+                screen->layerText,
+                sizeof(screen->layerText),
+                "Layer: %d/%d",
+                state.currentLayer,
+                state.totalLayers);
+
+            lv_label_set_text(
+                screen->infoLayerLabel,
+                screen->layerText);
+        }
+        else
+        {
+            lv_label_set_text(
+                screen->infoLayerLabel,
+                "");
+        }
 
         snprintf(
             screen->stagingTitle,
@@ -778,6 +817,10 @@ void HomeScreen::refreshCards(lv_timer_t *timer)
 
     lv_obj_add_flag(
         screen->infoAmsLabel,
+        LV_OBJ_FLAG_HIDDEN);
+
+    lv_obj_add_flag(
+        screen->infoLayerLabel,
         LV_OBJ_FLAG_HIDDEN);
 
     lv_obj_add_flag(

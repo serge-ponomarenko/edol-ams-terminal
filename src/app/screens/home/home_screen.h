@@ -33,9 +33,13 @@ private:
     lv_obj_t *infoTempLabel = nullptr;
     lv_obj_t *infoHumidityLabel = nullptr;
 
+    lv_obj_t *infoLayerLabel = nullptr;
+
     char stagingTitle[64];
     char stagingWeight[16];
     char stagingId[10];
+
+    char layerText[20];
 
     SlotCardV2 cards[5];
 

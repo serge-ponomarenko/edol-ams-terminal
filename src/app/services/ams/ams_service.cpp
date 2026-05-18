@@ -50,6 +50,9 @@ void AmsService::update()
         state.humidity = extractJsonInt(body, "humidityRaw");
         state.temperature = extractJsonFloat(body, "temperature");
 
+        state.currentLayer = extractJsonInt(body, "currentLayer");
+        state.totalLayers = extractJsonInt(body, "totalLayers");
+
         String extTray = extractJsonObject(body, "extTray");
         state.slots[4].slot = "EXT";
         state.slots[4].id = extractJsonInt(extTray, "spoolId");
