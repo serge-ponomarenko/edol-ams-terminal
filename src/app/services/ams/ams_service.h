@@ -19,4 +19,6 @@ private:
     static unsigned long lastFetch;
 
     static int requestId;
+
+    static inline bool previousPrinting = false;
 };

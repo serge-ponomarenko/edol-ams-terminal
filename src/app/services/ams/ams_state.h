@@ -15,5 +15,7 @@ struct AmsState {
     int currentLayer = 0;
     int totalLayers = 0;
 
+    bool printing = false;
+
     Spool slots[5];
 };

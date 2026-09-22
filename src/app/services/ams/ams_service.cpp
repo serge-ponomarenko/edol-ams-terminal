@@ -5,6 +5,7 @@
 #include "../../settings/settings_service.h"
 #include "../wifi/wifi_service.h"
 #include "../http/http_service.h"
+#include "../../../hardware/display/display.h"
 
 AmsState AmsService::state;
 
@@ -53,6 +54,8 @@ void AmsService::update()
         state.currentLayer = extractJsonInt(body, "currentLayer");
         state.totalLayers = extractJsonInt(body, "totalLayers");
 
+        state.printing = extractJsonBool(body, "printing");
+
         String extTray = extractJsonObject(body, "extTray");
         state.slots[4].slot = "EXT";
         state.slots[4].id = extractJsonInt(extTray, "spoolId");
@@ -83,6 +86,13 @@ void AmsService::update()
         state.loaded = true;
 
         Serial.println(F("AMS state updated"));
+
+        if (!previousPrinting && state.printing)
+        {
+            displayTouch();
+        }
+
+        previousPrinting = state.printing;
 
         return;
     }
