@@ -10,4 +10,6 @@ struct Settings {
 
     int amsPort;
 
+    char printerId[37];
+
 };

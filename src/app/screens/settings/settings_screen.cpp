@@ -309,6 +309,52 @@ void SettingsScreen::create()
         this);
 
     // ==========================
+    // PRINTER ID
+    // ==========================
+
+    lv_obj_t *printerIdLabel =
+        lv_label_create(formContainer);
+
+    lv_label_set_text(
+        printerIdLabel,
+        "Printer ID");
+
+    lv_obj_set_style_text_color(
+        printerIdLabel,
+        lv_color_white(),
+        0);
+
+    lv_obj_align(
+        printerIdLabel,
+        LV_ALIGN_TOP_LEFT,
+        10,
+        155);
+
+    printerIdInput =
+        lv_textarea_create(formContainer);
+
+    lv_textarea_set_text(
+        printerIdInput,
+        settings.printerId);
+
+    lv_obj_set_size(
+        printerIdInput,
+        315,
+        32);
+
+    lv_obj_align(
+        printerIdInput,
+        LV_ALIGN_TOP_LEFT,
+        5,
+        175);
+
+    lv_obj_add_event_cb(
+        printerIdInput,
+        onTextareaFocused,
+        LV_EVENT_FOCUSED,
+        this);
+
+    // ==========================
     // SPACER
     // ==========================
 
@@ -327,7 +373,7 @@ void SettingsScreen::create()
         spacer,
         LV_ALIGN_TOP_LEFT,
         0,
-        270);
+        230);
 
     // ==========================
     // BACK BUTTON
@@ -548,6 +594,14 @@ void SettingsScreen::onSaveClick(
         atoi(
             lv_textarea_get_text(
                 screen->amsPortInput));
+
+    strncpy(
+        settings.printerId,
+        lv_textarea_get_text(
+            screen->printerIdInput),
+        sizeof(settings.printerId) - 1);
+
+    settings.printerId[sizeof(settings.printerId) - 1] = '\0';
 
     SettingsService::save();
 

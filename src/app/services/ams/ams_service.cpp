@@ -111,13 +111,14 @@ void AmsService::update()
     lastFetch = now;
 
     Settings &settings = SettingsService::get();
-    char url[128];
+    char url[160];
     snprintf(
         url,
         sizeof(url),
-        "http://%s:%d/ams/state",
+        "http://%s:%d/ams/state?printerId=%s",
         settings.amsHost,
-        settings.amsPort);
+        settings.amsPort,
+        settings.printerId);
 
     Serial.println(F("Fetching AMS state..."));
     requestId = HttpService::get(url);

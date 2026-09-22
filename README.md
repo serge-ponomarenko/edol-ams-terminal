@@ -174,6 +174,7 @@ Configure:
 * WiFi Password
 * EDOL AMS Host
 * EDOL AMS Port
+* Printer ID (UUID from EDOL)
 
 After saving settings the device reboots automatically.
 

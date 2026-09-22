@@ -113,6 +113,8 @@ void StagingService::update()
         "/ams/find?id=" +
         spoolId;
 
+    url += "&printerId=" + String(settings.printerId);
+
     Serial.print(F("Resolving spool: "));
     Serial.println(spoolId);
 
@@ -145,6 +147,8 @@ void StagingService::assignToSlot(
         spool.id +
         "&slot=" +
         slot;
+
+    url += "&printerId=" + String(settings.printerId);
 
     assignRequestId = HttpService::get(url);
 
