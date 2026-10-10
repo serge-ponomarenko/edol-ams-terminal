@@ -5,6 +5,8 @@
 #include "../../navigation/navigation.h"
 #include "../../settings/settings_service.h"
 #include "../../services/wifi/wifi_service.h"
+#include "../../services/terminal/terminal_enrollment_service.h"
+#include "../../services/terminal/terminal_api.h"
 
 void SettingsScreen::create()
 {
@@ -40,7 +42,7 @@ void SettingsScreen::create()
     lv_obj_set_size(
         formContainer,
         LV_PCT(100),
-        170);
+        220);
 
     lv_obj_align(
         formContainer,
@@ -354,6 +356,33 @@ void SettingsScreen::create()
         LV_EVENT_FOCUSED,
         this);
 
+    lv_obj_t *pairingCodeLabel = lv_label_create(formContainer);
+    lv_label_set_text(pairingCodeLabel, "Secure pairing code");
+    lv_obj_set_style_text_color(pairingCodeLabel, lv_color_white(), 0);
+    lv_obj_align(pairingCodeLabel, LV_ALIGN_TOP_LEFT, 10, 230);
+
+    pairingCodeInput = lv_textarea_create(formContainer);
+    lv_textarea_set_max_length(pairingCodeInput, 10);
+    lv_obj_set_size(pairingCodeInput, 180, 32);
+    lv_obj_align(pairingCodeInput, LV_ALIGN_TOP_LEFT, 5, 250);
+    lv_obj_add_event_cb(pairingCodeInput, onTextareaFocused, LV_EVENT_FOCUSED, this);
+
+    lv_obj_t *enrollButton = lv_btn_create(formContainer);
+    lv_obj_set_size(enrollButton, 100, 32);
+    lv_obj_align(enrollButton, LV_ALIGN_TOP_LEFT, 195, 250);
+    lv_obj_t *enrollLabel = lv_label_create(enrollButton);
+    lv_label_set_text(enrollLabel, "ENROLL");
+    lv_obj_center(enrollLabel);
+    lv_obj_add_event_cb(enrollButton, onEnrollClick, LV_EVENT_CLICKED, this);
+
+    lv_obj_t *forgetCredentialButton = lv_btn_create(formContainer);
+    lv_obj_set_size(forgetCredentialButton, 150, 32);
+    lv_obj_align(forgetCredentialButton, LV_ALIGN_TOP_LEFT, 5, 295);
+    lv_obj_t *forgetCredentialLabel = lv_label_create(forgetCredentialButton);
+    lv_label_set_text(forgetCredentialLabel, "FORGET SECURE");
+    lv_obj_center(forgetCredentialLabel);
+    lv_obj_add_event_cb(forgetCredentialButton, onForgetSecureCredentialClick, LV_EVENT_CLICKED, this);
+
     // ==========================
     // SPACER
     // ==========================
@@ -367,13 +396,13 @@ void SettingsScreen::create()
     lv_obj_set_size(
         spacer,
         1,
-        120);
+        190);
 
     lv_obj_align(
         spacer,
         LV_ALIGN_TOP_LEFT,
         0,
-        230);
+        340);
 
     // ==========================
     // BACK BUTTON
@@ -721,5 +750,28 @@ void SettingsScreen::updateConnectionStatus(
         lv_label_set_text(
             screen->ipLabel,
             "-");
+    }
+}
+
+void SettingsScreen::onEnrollClick(
+    lv_event_t *event)
+{
+    SettingsScreen *screen = static_cast<SettingsScreen *>(lv_event_get_user_data(event));
+    Settings &settings = SettingsService::get();
+    strncpy(settings.amsHost, lv_textarea_get_text(screen->amsHostInput), sizeof(settings.amsHost) - 1);
+    settings.amsHost[sizeof(settings.amsHost) - 1] = '\0';
+    settings.amsPort = atoi(lv_textarea_get_text(screen->amsPortInput));
+    strncpy(settings.printerId, lv_textarea_get_text(screen->printerIdInput), sizeof(settings.printerId) - 1);
+    settings.printerId[sizeof(settings.printerId) - 1] = '\0';
+    TerminalEnrollmentService::start(lv_textarea_get_text(screen->pairingCodeInput));
+}
+
+void SettingsScreen::onForgetSecureCredentialClick(
+    lv_event_t *event)
+{
+    (void) event;
+    if (TerminalApi::isReady())
+    {
+        TerminalApi::factoryReset();
     }
 }

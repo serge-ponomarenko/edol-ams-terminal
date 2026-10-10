@@ -5,6 +5,7 @@
 #include "../../settings/settings_service.h"
 #include "../wifi/wifi_service.h"
 #include "../http/http_service.h"
+#include "../terminal/terminal_api.h"
 #include "../../../hardware/display/display.h"
 
 AmsState AmsService::state;
@@ -111,17 +112,25 @@ void AmsService::update()
     lastFetch = now;
 
     Settings &settings = SettingsService::get();
-    char url[160];
-    snprintf(
-        url,
-        sizeof(url),
-        "http://%s:%d/ams/state?printerId=%s",
-        settings.amsHost,
-        settings.amsPort,
-        settings.printerId);
+    String url;
+    String authorization;
+    if (settings.secureMode)
+    {
+        if (!TerminalApi::isReady())
+        {
+            return;
+        }
+        url = TerminalApi::url("/api/terminal/v1/state");
+        authorization = TerminalApi::authorization();
+    }
+    else
+    {
+        url = "http://" + String(settings.amsHost) + ":" + settings.amsPort
+                + "/ams/state?printerId=" + settings.printerId;
+    }
 
     Serial.println(F("Fetching AMS state..."));
-    requestId = HttpService::get(url);
+    requestId = HttpService::get(url, authorization);
 }
 
 AmsState &AmsService::getState()

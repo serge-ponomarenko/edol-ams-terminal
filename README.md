@@ -176,7 +176,47 @@ Configure:
 * EDOL AMS Port
 * Printer ID (UUID from EDOL)
 
+For home mode, these settings retain the existing trusted-network HTTP flow.
+
 After saving settings the device reboots automatically.
+
+## Secure Multi-Tenant Enrollment
+
+Secure mode is a separate deployment mode. It is not enabled by a home-mode
+configuration and never falls back to HTTP.
+
+Before enrollment, the deployment must provide an AMS HTTPS endpoint whose
+certificate chains to the PEM value compiled as `EDOL_AMS_ROOT_CA_PEM`. The
+certificate must match the configured AMS host. The terminal deliberately fails
+closed when the CA is absent, its TLS clock cannot synchronize through NTP, or
+certificate validation fails.
+
+The ESP32 must be provisioned with flash encryption and secure boot before an
+enrollment attempt. Terminal credentials are stored only in the encrypted NVS
+namespace after these hardware checks pass; LittleFS remains only for ordinary
+WiFi and endpoint settings.
+
+An EDOL Hub owner creates a pairing for exactly one printer and receives a
+10-character code. On the terminal Settings screen, enter the printer UUID and
+that code, then choose **ENROLL**. The terminal sends the code once to
+`POST /api/terminal/v1/enroll` over TLS. On success it stores the returned
+terminal credential and restarts in secure mode. The code and credential must
+not be recorded, copied into source, or entered in any other terminal field.
+
+Secure mode uses only the terminal credential on these AMS paths:
+
+- `GET /api/terminal/v1/state`
+- `GET /api/terminal/v1/find?id={spoolId}`
+- `POST /api/terminal/v1/set-spool`
+
+It never sends a tenant ID or an operational `printerId`; AMS derives both from
+the authenticated terminal record. Revocation, rotation, replacement, and a
+factory reset require a new owner-issued pairing. A terminal without a stored
+credential does not enter secure operational mode. For a physical reset, the
+owner must first revoke or factory-reset the terminal through Hub. The
+terminal's **FORGET SECURE** action then clears only its local encrypted-NVS
+credential and restarts; it never authorizes or performs the server-side
+lifecycle operation.
 
 ---
 

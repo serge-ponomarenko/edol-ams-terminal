@@ -9,6 +9,8 @@ public:
     static void update();
 
     static int get(const String &url);
+    static int get(const String &url, const String &authorization);
+    static int post(const String &url, const String &body, const String &authorization = "");
 
     static bool isCompleted(int requestId);
 

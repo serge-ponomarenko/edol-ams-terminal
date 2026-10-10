@@ -18,6 +18,8 @@
 #include "services/staging/staging_service.h"
 #include "services/http/http_service.h"
 #include "screens/settings/settings_screen.h"
+#include "services/terminal/terminal_enrollment_service.h"
+#include "settings/terminal_credential_store.h"
 
 LoadingScreen *App::loadingScreen = nullptr;
 
@@ -41,7 +43,8 @@ void App::setup()
 
     nfcSetup();
 
-    if (SettingsService::get().wifiSsid[0] == '\0')
+    if (SettingsService::get().wifiSsid[0] == '\0'
+            || (SettingsService::get().secureMode && !TerminalCredentialStore::hasCredential()))
     {
         Navigation::push(new SettingsScreen());
     }
@@ -70,6 +73,8 @@ void App::update()
     WifiService::update();
 
     HttpService::update();
+
+    TerminalEnrollmentService::update();
 
     AmsService::update();
 

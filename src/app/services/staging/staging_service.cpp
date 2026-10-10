@@ -7,6 +7,7 @@
 #include "../wifi/wifi_service.h"
 #include "../http/http_service.h"
 #include "../ams/ams_service.h"
+#include "../terminal/terminal_api.h"
 
 Spool StagingService::spool;
 
@@ -105,20 +106,27 @@ void StagingService::update()
 
     Settings &settings = SettingsService::get();
 
-    String url =
-        String("http://") +
-        settings.amsHost +
-        ":" +
-        settings.amsPort +
-        "/ams/find?id=" +
-        spoolId;
-
-    url += "&printerId=" + String(settings.printerId);
+    String url;
+    String authorization;
+    if (settings.secureMode)
+    {
+        if (!TerminalApi::isReady())
+        {
+            return;
+        }
+        url = TerminalApi::url("/api/terminal/v1/find?id=") + spoolId;
+        authorization = TerminalApi::authorization();
+    }
+    else
+    {
+        url = String("http://") + settings.amsHost + ":" + settings.amsPort
+                + "/ams/find?id=" + spoolId + "&printerId=" + String(settings.printerId);
+    }
 
     Serial.print(F("Resolving spool: "));
     Serial.println(spoolId);
 
-    requestId = HttpService::get(url);
+    requestId = HttpService::get(url, authorization);
 }
 
 void StagingService::clear()
@@ -138,19 +146,29 @@ void StagingService::assignToSlot(
 
     Settings &settings = SettingsService::get();
 
-    String url =
-        String("http://") +
-        settings.amsHost +
-        ":" +
-        settings.amsPort +
-        "/ams/set-spool?id=" +
-        spool.id +
-        "&slot=" +
-        slot;
-
-    url += "&printerId=" + String(settings.printerId);
-
-    assignRequestId = HttpService::get(url);
+    String url;
+    String authorization;
+    if (settings.secureMode)
+    {
+        if (!TerminalApi::isReady())
+        {
+            return;
+        }
+        url = TerminalApi::url("/api/terminal/v1/set-spool");
+        authorization = TerminalApi::authorization();
+        assignRequestId = HttpService::post(
+                url,
+                String("{\"spoolId\":") + spool.id + ",\"slot\":" + slot + "}",
+                authorization
+        );
+    }
+    else
+    {
+        url = String("http://") + settings.amsHost + ":" + settings.amsPort
+                + "/ams/set-spool?id=" + spool.id + "&slot=" + slot
+                + "&printerId=" + String(settings.printerId);
+        assignRequestId = HttpService::get(url);
+    }
 
     Serial.print(F("Assign spool "));
     Serial.print(spool.id);

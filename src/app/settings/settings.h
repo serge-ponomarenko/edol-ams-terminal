@@ -12,4 +12,6 @@ struct Settings {
 
     char printerId[37];
 
+    bool secureMode;
+
 };

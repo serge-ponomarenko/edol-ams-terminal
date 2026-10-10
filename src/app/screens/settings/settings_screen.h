@@ -25,6 +25,7 @@ private:
     lv_obj_t *amsHostInput = nullptr;
     lv_obj_t *amsPortInput = nullptr;
     lv_obj_t *printerIdInput = nullptr;
+    lv_obj_t *pairingCodeInput = nullptr;
 
     lv_timer_t *statusTimer = nullptr;
 
@@ -32,6 +33,12 @@ private:
         lv_event_t *event);
 
     static void onSaveClick(
+        lv_event_t *event);
+
+    static void onEnrollClick(
+        lv_event_t *event);
+
+    static void onForgetSecureCredentialClick(
         lv_event_t *event);
 
     static void onTextareaFocused(
