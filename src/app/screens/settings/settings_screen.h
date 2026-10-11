@@ -25,6 +25,7 @@ private:
     lv_obj_t *passwordInput = nullptr;
     lv_obj_t *amsHostInput = nullptr;
     lv_obj_t *amsPortInput = nullptr;
+    lv_obj_t *amsUseHttpsSwitch = nullptr;
     lv_obj_t *printerIdInput = nullptr;
     lv_obj_t *pairingCodeInput = nullptr;
 

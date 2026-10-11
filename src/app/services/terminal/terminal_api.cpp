@@ -22,7 +22,8 @@ String TerminalApi::authorization()
 String TerminalApi::url(const char *path)
 {
     Settings &settings = SettingsService::get();
-    return "https://" + String(settings.amsHost) + ":" + settings.amsPort + path;
+    return String(settings.amsUseHttps ? "https://" : "http://")
+            + String(settings.amsHost) + ":" + settings.amsPort + path;
 }
 
 void TerminalApi::factoryReset()

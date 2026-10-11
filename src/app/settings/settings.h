@@ -10,6 +10,8 @@ struct Settings {
 
     int amsPort;
 
+    bool amsUseHttps;
+
     char printerId[37];
 
     bool secureMode;

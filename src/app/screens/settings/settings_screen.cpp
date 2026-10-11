@@ -310,8 +310,25 @@ void SettingsScreen::create()
         LV_EVENT_FOCUSED,
         this);
 
+    lv_obj_t *amsTransportLabel = lv_label_create(formContainer);
+    lv_label_set_text(amsTransportLabel, "Use HTTPS");
+    lv_obj_set_style_text_color(amsTransportLabel, lv_color_white(), 0);
+    lv_obj_align(amsTransportLabel, LV_ALIGN_TOP_LEFT, 10, 155);
+
+    amsUseHttpsSwitch = lv_switch_create(formContainer);
+    lv_obj_align(amsUseHttpsSwitch, LV_ALIGN_TOP_LEFT, 100, 150);
+    if (settings.amsUseHttps)
+    {
+        lv_obj_add_state(amsUseHttpsSwitch, LV_STATE_CHECKED);
+    }
+
+    lv_obj_t *trustedLanLabel = lv_label_create(formContainer);
+    lv_label_set_text(trustedLanLabel, "HTTP is for trusted LAN only");
+    lv_obj_set_style_text_color(trustedLanLabel, lv_palette_main(LV_PALETTE_YELLOW), 0);
+    lv_obj_align(trustedLanLabel, LV_ALIGN_TOP_LEFT, 155, 155);
+
     // ==========================
-    // PRINTER ID
+    // LEGACY HOME PRINTER ID
     // ==========================
 
     lv_obj_t *printerIdLabel =
@@ -319,7 +336,7 @@ void SettingsScreen::create()
 
     lv_label_set_text(
         printerIdLabel,
-        "Printer ID");
+        "Printer ID (legacy Home)");
 
     lv_obj_set_style_text_color(
         printerIdLabel,
@@ -330,7 +347,7 @@ void SettingsScreen::create()
         printerIdLabel,
         LV_ALIGN_TOP_LEFT,
         10,
-        155);
+        195);
 
     printerIdInput =
         lv_textarea_create(formContainer);
@@ -348,7 +365,7 @@ void SettingsScreen::create()
         printerIdInput,
         LV_ALIGN_TOP_LEFT,
         5,
-        175);
+        215);
 
     lv_obj_add_event_cb(
         printerIdInput,
@@ -357,19 +374,19 @@ void SettingsScreen::create()
         this);
 
     lv_obj_t *pairingCodeLabel = lv_label_create(formContainer);
-    lv_label_set_text(pairingCodeLabel, "Secure pairing code");
+    lv_label_set_text(pairingCodeLabel, "Pairing code");
     lv_obj_set_style_text_color(pairingCodeLabel, lv_color_white(), 0);
-    lv_obj_align(pairingCodeLabel, LV_ALIGN_TOP_LEFT, 10, 230);
+    lv_obj_align(pairingCodeLabel, LV_ALIGN_TOP_LEFT, 10, 270);
 
     pairingCodeInput = lv_textarea_create(formContainer);
     lv_textarea_set_max_length(pairingCodeInput, 10);
     lv_obj_set_size(pairingCodeInput, 180, 32);
-    lv_obj_align(pairingCodeInput, LV_ALIGN_TOP_LEFT, 5, 250);
+    lv_obj_align(pairingCodeInput, LV_ALIGN_TOP_LEFT, 5, 290);
     lv_obj_add_event_cb(pairingCodeInput, onTextareaFocused, LV_EVENT_FOCUSED, this);
 
     lv_obj_t *enrollButton = lv_btn_create(formContainer);
     lv_obj_set_size(enrollButton, 100, 32);
-    lv_obj_align(enrollButton, LV_ALIGN_TOP_LEFT, 195, 250);
+    lv_obj_align(enrollButton, LV_ALIGN_TOP_LEFT, 195, 290);
     lv_obj_t *enrollLabel = lv_label_create(enrollButton);
     lv_label_set_text(enrollLabel, "ENROLL");
     lv_obj_center(enrollLabel);
@@ -377,9 +394,9 @@ void SettingsScreen::create()
 
     lv_obj_t *forgetCredentialButton = lv_btn_create(formContainer);
     lv_obj_set_size(forgetCredentialButton, 150, 32);
-    lv_obj_align(forgetCredentialButton, LV_ALIGN_TOP_LEFT, 5, 295);
+    lv_obj_align(forgetCredentialButton, LV_ALIGN_TOP_LEFT, 5, 335);
     lv_obj_t *forgetCredentialLabel = lv_label_create(forgetCredentialButton);
-    lv_label_set_text(forgetCredentialLabel, "FORGET SECURE");
+    lv_label_set_text(forgetCredentialLabel, "FORGET TERMINAL");
     lv_obj_center(forgetCredentialLabel);
     lv_obj_add_event_cb(forgetCredentialButton, onForgetSecureCredentialClick, LV_EVENT_CLICKED, this);
 
@@ -387,7 +404,7 @@ void SettingsScreen::create()
     lv_obj_set_width(enrollmentStatusLabel, 310);
     lv_label_set_long_mode(enrollmentStatusLabel, LV_LABEL_LONG_WRAP);
     lv_obj_set_style_text_font(enrollmentStatusLabel, &lv_font_montserrat_16, 0);
-    lv_obj_align(enrollmentStatusLabel, LV_ALIGN_TOP_LEFT, 5, 340);
+    lv_obj_align(enrollmentStatusLabel, LV_ALIGN_TOP_LEFT, 5, 380);
 
     // ==========================
     // SPACER
@@ -408,7 +425,7 @@ void SettingsScreen::create()
         spacer,
         LV_ALIGN_TOP_LEFT,
         0,
-        400);
+        440);
 
     // ==========================
     // BACK BUTTON
@@ -630,6 +647,8 @@ void SettingsScreen::onSaveClick(
             lv_textarea_get_text(
                 screen->amsPortInput));
 
+    settings.amsUseHttps = lv_obj_has_state(screen->amsUseHttpsSwitch, LV_STATE_CHECKED);
+
     strncpy(
         settings.printerId,
         lv_textarea_get_text(
@@ -771,7 +790,7 @@ void SettingsScreen::updateConnectionStatus(
     }
     else if (SettingsService::get().secureMode)
     {
-        lv_label_set_text(screen->enrollmentStatusLabel, "Enrollment complete. Secure terminal is active.");
+        lv_label_set_text(screen->enrollmentStatusLabel, "Enrollment complete. Terminal is active.");
         lv_obj_set_style_text_color(screen->enrollmentStatusLabel, lv_palette_main(LV_PALETTE_GREEN), 0);
     }
     else
@@ -789,6 +808,7 @@ void SettingsScreen::onEnrollClick(
     strncpy(settings.amsHost, lv_textarea_get_text(screen->amsHostInput), sizeof(settings.amsHost) - 1);
     settings.amsHost[sizeof(settings.amsHost) - 1] = '\0';
     settings.amsPort = atoi(lv_textarea_get_text(screen->amsPortInput));
+    settings.amsUseHttps = lv_obj_has_state(screen->amsUseHttpsSwitch, LV_STATE_CHECKED);
     strncpy(settings.printerId, lv_textarea_get_text(screen->printerIdInput), sizeof(settings.printerId) - 1);
     settings.printerId[sizeof(settings.printerId) - 1] = '\0';
     TerminalEnrollmentService::start(lv_textarea_get_text(screen->pairingCodeInput));

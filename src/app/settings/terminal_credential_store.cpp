@@ -1,18 +1,11 @@
 #include "terminal_credential_store.h"
 
 #include <Preferences.h>
-#include <esp_flash_encrypt.h>
-#include <esp_secure_boot.h>
 
 namespace {
 constexpr const char *NAMESPACE = "edol-terminal";
 constexpr const char *TERMINAL_ID_KEY = "terminal-id";
 constexpr const char *SECRET_KEY = "secret";
-}
-
-bool TerminalCredentialStore::isHardwareProtected()
-{
-    return esp_flash_encryption_enabled() && esp_secure_boot_enabled();
 }
 
 bool TerminalCredentialStore::hasCredential()
@@ -24,7 +17,7 @@ bool TerminalCredentialStore::hasCredential()
 
 bool TerminalCredentialStore::save(const String &terminalId, const String &secret)
 {
-    if (!isHardwareProtected() || terminalId.isEmpty() || secret.isEmpty())
+    if (terminalId.isEmpty() || secret.isEmpty())
     {
         return false;
     }
@@ -41,10 +34,6 @@ bool TerminalCredentialStore::save(const String &terminalId, const String &secre
 
 bool TerminalCredentialStore::load(String &terminalId, String &secret)
 {
-    if (!isHardwareProtected())
-    {
-        return false;
-    }
     Preferences preferences;
     if (!preferences.begin(NAMESPACE, true))
     {

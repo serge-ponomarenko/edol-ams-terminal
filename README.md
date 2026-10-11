@@ -174,68 +174,30 @@ Configure:
 * WiFi Password
 * EDOL AMS Host
 * EDOL AMS Port
-* Printer ID (UUID from EDOL)
+* HTTP or HTTPS transport
+* Printer ID only for legacy Home mode
 
 For home mode, these settings retain the existing trusted-network HTTP flow.
 
 After saving settings the device reboots automatically.
 
-## Secure Multi-Tenant Enrollment
+## AMS Terminal Pairing
 
-Secure mode is a separate deployment mode. It is not enabled by a home-mode
-configuration and never falls back to HTTP.
+The normal Stage 8 image builds with `pio run` and uses standard ESP32 Preferences (NVS) to persist its terminal credential. It does not require Secure Boot, Flash Encryption, encrypted NVS, eFuse provisioning, or a hardware-backed credential store.
 
-Before enrollment, the deployment must provide an AMS HTTPS endpoint whose
-certificate chains to the PEM value compiled as `EDOL_AMS_ROOT_CA_PEM`. The
-certificate must match the configured AMS host. The terminal deliberately fails
-closed when the CA is absent, its TLS clock cannot synchronize through NTP, or
-certificate validation fails.
+Choose the transport explicitly on the Settings screen. HTTP is the default for a trusted private LAN and requires no certificate configuration. HTTPS is available when the firmware is built with a trusted CA through the normal PlatformIO build flags; HTTPS validates that CA and never falls back to HTTP after a TLS error. An HTTP deployment exposes pairing codes and terminal credentials to a network interceptor, so it must not be used on untrusted or Internet-exposed networks.
 
-The project supplies a PlatformIO build hook for the trusted CA. It reads a
-public CA PEM from a protected local path and injects it only into the firmware
-build; it never writes the PEM to this repository. For a secure image, set
-`EDOL_TERMINAL_SECURE_BUILD=1` and `EDOL_AMS_ROOT_CA_FILE` to the CA PEM path
-before running `pio run`. The secure build fails if the CA-file input is absent
-or malformed. The deployment's existing ingress or PKI process supplies this
-CA; an operator must not create a certificate for an individual terminal or
-enrollment.
+An EDOL Hub owner opens the printer's **AMS Terminal** section and chooses **Pair AMS Terminal**. Hub displays one 10-character pairing code for five minutes. Enter only that code on the terminal and choose **ENROLL**. The terminal sends it once to `POST /api/terminal/v1/enroll`; AMS uses the pairing record to bind the terminal to its tenant and printer, then returns a random terminal credential. The firmware stores that credential in Preferences and never shows or logs it. The legacy **Printer ID** field is not required for this workflow and remains only for Home-mode routes.
 
-The ESP32 must be provisioned with flash encryption and secure boot before an
-enrollment attempt. Terminal credentials are stored only in the encrypted NVS
-namespace after these hardware checks pass; LittleFS remains only for ordinary
-WiFi and endpoint settings.
+If a pairing expires, use **Regenerate expired pairing** in Hub. Hub also provides owner-confirmed credential rotation, revocation, replacement, and factory-reset actions. After any lifecycle action that denies the credential, pair the terminal again.
 
-An EDOL Hub owner opens the printer's **AMS Terminal** section and creates a
-pairing for exactly one printer. Hub displays a 10-character code once with an
-expiration countdown. On the terminal Settings screen, enter the printer UUID
-and that code, then choose **ENROLL**. The terminal sends the code once to
-`POST /api/terminal/v1/enroll` over TLS. On success it stores the returned
-terminal credential and immediately switches to secure mode. The screen shows
-completion, pairing-code, rate-limit, and TLS/connectivity failures without
-displaying a secret. The code and credential must not be recorded, copied into
-source, or entered in any other terminal field.
-
-Ordinary enrollment requires no direct HTTP call, developer tools, temporary
-proxy, or per-enrollment certificate. If a pairing is still pending, Hub keeps
-it active until expiry. After expiry, the owner can choose **Regenerate expired
-pairing**; **Replace terminal** is the explicit action when a valid pending
-code must be invalidated. Hub also provides owner-confirmed credential
-rotation, revocation, replacement, and factory-reset actions.
-
-Secure mode uses only the terminal credential on these AMS paths:
+Authenticated terminal operations use only the terminal credential on these AMS paths:
 
 - `GET /api/terminal/v1/state`
 - `GET /api/terminal/v1/find?id={spoolId}`
 - `POST /api/terminal/v1/set-spool`
 
-It never sends a tenant ID or an operational `printerId`; AMS derives both from
-the authenticated terminal record. Revocation, rotation, replacement, and a
-factory reset require a new owner-issued pairing. A terminal without a stored
-credential does not enter secure operational mode. For a physical reset, the
-owner must first revoke or factory-reset the terminal through Hub. The
-terminal's **FORGET SECURE** action then clears only its local encrypted-NVS
-credential and restarts; it never authorizes or performs the server-side
-lifecycle operation.
+It never sends a tenant ID or operational `printerId`; AMS derives both from the authenticated terminal record. Revocation, rotation, replacement, and a factory reset require a new owner-issued pairing. For a physical reset, the owner must first revoke or factory-reset the terminal through Hub. The terminal's **FORGET TERMINAL** action clears only its local NVS credential and restarts; it never authorizes or performs the server-side lifecycle operation.
 
 ---
 

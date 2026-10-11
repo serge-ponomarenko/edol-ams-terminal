@@ -25,6 +25,7 @@ void SettingsService::begin()
         strcpy(settings.wifiPassword, "");
         strcpy(settings.amsHost, "192.168.0.200");
         settings.amsPort = 8099;
+        settings.amsUseHttps = false;
         strcpy(settings.printerId, "");
         settings.secureMode = false;
         save();
@@ -58,6 +59,7 @@ bool SettingsService::save()
         "\"wifiPassword\":\"%s\","
         "\"amsHost\":\"%s\","
         "\"amsPort\":%d,"
+        "\"amsUseHttps\":%s,"
         "\"printerId\":\"%s\","
         "\"secureMode\":%s"
         "}",
@@ -65,6 +67,7 @@ bool SettingsService::save()
         settings.wifiPassword,
         settings.amsHost,
         settings.amsPort,
+        settings.amsUseHttps ? "true" : "false",
         settings.printerId,
         settings.secureMode ? "true" : "false"
     );
@@ -100,6 +103,7 @@ bool SettingsService::load()
     strcpy(settings.wifiPassword, extractJsonString(json, "wifiPassword").c_str());
     strcpy(settings.amsHost, extractJsonString(json, "amsHost").c_str());
     settings.amsPort = extractJsonInt(json, "amsPort");
+    settings.amsUseHttps = extractJsonBool(json, "amsUseHttps");
     strcpy(settings.printerId, extractJsonString(json, "printerId").c_str());
     settings.secureMode = extractJsonBool(json, "secureMode");
 
