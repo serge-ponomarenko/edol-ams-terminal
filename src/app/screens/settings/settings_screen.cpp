@@ -220,7 +220,7 @@ void SettingsScreen::create()
 
     lv_label_set_text(
         amsHostLabel,
-        "EDOL AMS Host");
+        "AMS host (not Hub)");
 
     lv_obj_set_style_text_color(
         amsHostLabel,
@@ -266,7 +266,7 @@ void SettingsScreen::create()
 
     lv_label_set_text(
         amsPortLabel,
-        "Port");
+        "AMS port");
 
     lv_obj_set_style_text_color(
         amsPortLabel,
@@ -311,7 +311,7 @@ void SettingsScreen::create()
         this);
 
     lv_obj_t *amsTransportLabel = lv_label_create(formContainer);
-    lv_label_set_text(amsTransportLabel, "Use HTTPS");
+    lv_label_set_text(amsTransportLabel, "HTTPS (off = HTTP)");
     lv_obj_set_style_text_color(amsTransportLabel, lv_color_white(), 0);
     lv_obj_align(amsTransportLabel, LV_ALIGN_TOP_LEFT, 10, 155);
 
@@ -323,7 +323,7 @@ void SettingsScreen::create()
     }
 
     lv_obj_t *trustedLanLabel = lv_label_create(formContainer);
-    lv_label_set_text(trustedLanLabel, "HTTP is for trusted LAN only");
+    lv_label_set_text(trustedLanLabel, "Use PC running AMS");
     lv_obj_set_style_text_color(trustedLanLabel, lv_palette_main(LV_PALETTE_YELLOW), 0);
     lv_obj_align(trustedLanLabel, LV_ALIGN_TOP_LEFT, 155, 155);
 
@@ -795,7 +795,14 @@ void SettingsScreen::updateConnectionStatus(
     }
     else
     {
-        lv_label_set_text(screen->enrollmentStatusLabel, "Enter the Hub pairing code, then choose ENROLL.");
+        Settings &settings = SettingsService::get();
+        lv_label_set_text_fmt(
+                screen->enrollmentStatusLabel,
+                "Enter the Hub code, then ENROLL. Target: %s://%s:%d",
+                settings.amsUseHttps ? "https" : "http",
+                settings.amsHost,
+                settings.amsPort
+        );
         lv_obj_set_style_text_color(screen->enrollmentStatusLabel, lv_color_white(), 0);
     }
 }
@@ -811,6 +818,7 @@ void SettingsScreen::onEnrollClick(
     settings.amsUseHttps = lv_obj_has_state(screen->amsUseHttpsSwitch, LV_STATE_CHECKED);
     strncpy(settings.printerId, lv_textarea_get_text(screen->printerIdInput), sizeof(settings.printerId) - 1);
     settings.printerId[sizeof(settings.printerId) - 1] = '\0';
+    SettingsService::save(false);
     TerminalEnrollmentService::start(lv_textarea_get_text(screen->pairingCodeInput));
 }
 

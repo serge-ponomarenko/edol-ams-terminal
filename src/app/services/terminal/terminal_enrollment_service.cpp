@@ -8,9 +8,15 @@
 
 bool TerminalEnrollmentService::start(const String &pairingCode)
 {
+    Settings &settings = SettingsService::get();
     if (requestId >= 0 || pairingCode.length() != 10)
     {
         error = "Enter the 10-character pairing code";
+        return false;
+    }
+    if (settings.amsHost[0] == '\0' || settings.amsPort <= 0 || settings.amsPort > 65535)
+    {
+        error = "Enter the AMS address and port";
         return false;
     }
     String url = TerminalApi::url("/api/terminal/v1/enroll");
@@ -48,7 +54,9 @@ void TerminalEnrollmentService::update()
         }
         else
         {
-            error = "TLS validation failed or AMS is unreachable";
+            error = SettingsService::get().amsUseHttps
+                    ? "HTTPS failed. Check the AMS address, port, and trusted CA"
+                    : "Cannot reach AMS. Check its address, port, WiFi, and firewall";
         }
         HttpService::clear(requestId);
         requestId = -1;

@@ -12,7 +12,7 @@ public:
 
     static bool load();
 
-    static bool save();
+    static bool save(bool restart = true);
 
 private:
 

@@ -172,8 +172,8 @@ Configure:
 
 * WiFi SSID
 * WiFi Password
-* EDOL AMS Host
-* EDOL AMS Port
+* AMS address: the LAN IP address or DNS name of the computer running **edol-ams**, not EDOL Hub
+* AMS port: the port on which **edol-ams** listens
 * HTTP or HTTPS transport
 * Printer ID only for legacy Home mode
 
@@ -185,7 +185,7 @@ After saving settings the device reboots automatically.
 
 The normal Stage 8 image builds with `pio run` and uses standard ESP32 Preferences (NVS) to persist its terminal credential. It does not require Secure Boot, Flash Encryption, encrypted NVS, eFuse provisioning, or a hardware-backed credential store.
 
-Choose the transport explicitly on the Settings screen. HTTP is the default for a trusted private LAN and requires no certificate configuration. HTTPS is available when the firmware is built with a trusted CA through the normal PlatformIO build flags; HTTPS validates that CA and never falls back to HTTP after a TLS error. An HTTP deployment exposes pairing codes and terminal credentials to a network interceptor, so it must not be used on untrusted or Internet-exposed networks.
+Choose the transport explicitly on the Settings screen. HTTP is the default for a trusted private LAN and requires no certificate configuration. HTTPS is available when the firmware is built with a trusted CA through the normal PlatformIO build flags; HTTPS validates that CA and never falls back to HTTP after a TLS error. An HTTP deployment exposes pairing codes and terminal credentials to a network interceptor, so it must not be used on untrusted or Internet-exposed networks. The values currently visible in the Settings screen are persisted and used when **ENROLL** is selected; **SAVE** also persists them and reboots the terminal.
 
 An EDOL Hub owner opens the printer's **AMS Terminal** section and chooses **Pair AMS Terminal**. Hub displays one 10-character pairing code for five minutes. Enter only that code on the terminal and choose **ENROLL**. The terminal sends it once to `POST /api/terminal/v1/enroll`; AMS uses the pairing record to bind the terminal to its tenant and printer, then returns a random terminal credential. The firmware stores that credential in Preferences and never shows or logs it. The legacy **Printer ID** field is not required for this workflow and remains only for Home-mode routes.
 

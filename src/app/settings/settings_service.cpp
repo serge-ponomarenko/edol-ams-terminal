@@ -37,7 +37,7 @@ Settings &SettingsService::get()
     return settings;
 }
 
-bool SettingsService::save()
+bool SettingsService::save(bool restart)
 {
     File file = LittleFS.open(SETTINGS_FILE, "w");
 
@@ -76,7 +76,10 @@ bool SettingsService::save()
 
     file.close();
 
-    ESP.restart();
+    if (restart)
+    {
+        ESP.restart();
+    }
 
     return true;
 }
