@@ -34,7 +34,23 @@ void TerminalEnrollmentService::update()
     }
     if (!HttpService::isSuccess(requestId))
     {
-        error = "Enrollment rejected or TLS validation failed";
+        int responseCode = HttpService::getResponseCode(requestId);
+        if (responseCode == 401)
+        {
+            error = "Pairing code is invalid, expired, or already used";
+        }
+        else if (responseCode == 429)
+        {
+            error = "Too many enrollment attempts. Wait before retrying";
+        }
+        else if (responseCode > 0)
+        {
+            error = "AMS rejected enrollment. Check the printer and pairing code";
+        }
+        else
+        {
+            error = "TLS validation failed or AMS is unreachable";
+        }
         HttpService::clear(requestId);
         requestId = -1;
         return;
@@ -51,6 +67,7 @@ void TerminalEnrollmentService::update()
     }
     SettingsService::get().secureMode = true;
     SettingsService::save();
+    error = "";
 }
 
 bool TerminalEnrollmentService::isBusy()

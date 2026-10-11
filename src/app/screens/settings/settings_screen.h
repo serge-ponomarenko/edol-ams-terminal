@@ -19,6 +19,7 @@ private:
 
     lv_obj_t *wifiStatusLabel = nullptr;
     lv_obj_t *ipLabel = nullptr;
+    lv_obj_t *enrollmentStatusLabel = nullptr;
 
     lv_obj_t *ssidInput = nullptr;
     lv_obj_t *passwordInput = nullptr;

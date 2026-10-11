@@ -191,17 +191,36 @@ certificate must match the configured AMS host. The terminal deliberately fails
 closed when the CA is absent, its TLS clock cannot synchronize through NTP, or
 certificate validation fails.
 
+The project supplies a PlatformIO build hook for the trusted CA. It reads a
+public CA PEM from a protected local path and injects it only into the firmware
+build; it never writes the PEM to this repository. For a secure image, set
+`EDOL_TERMINAL_SECURE_BUILD=1` and `EDOL_AMS_ROOT_CA_FILE` to the CA PEM path
+before running `pio run`. The secure build fails if the CA-file input is absent
+or malformed. The deployment's existing ingress or PKI process supplies this
+CA; an operator must not create a certificate for an individual terminal or
+enrollment.
+
 The ESP32 must be provisioned with flash encryption and secure boot before an
 enrollment attempt. Terminal credentials are stored only in the encrypted NVS
 namespace after these hardware checks pass; LittleFS remains only for ordinary
 WiFi and endpoint settings.
 
-An EDOL Hub owner creates a pairing for exactly one printer and receives a
-10-character code. On the terminal Settings screen, enter the printer UUID and
-that code, then choose **ENROLL**. The terminal sends the code once to
+An EDOL Hub owner opens the printer's **AMS Terminal** section and creates a
+pairing for exactly one printer. Hub displays a 10-character code once with an
+expiration countdown. On the terminal Settings screen, enter the printer UUID
+and that code, then choose **ENROLL**. The terminal sends the code once to
 `POST /api/terminal/v1/enroll` over TLS. On success it stores the returned
-terminal credential and restarts in secure mode. The code and credential must
-not be recorded, copied into source, or entered in any other terminal field.
+terminal credential and immediately switches to secure mode. The screen shows
+completion, pairing-code, rate-limit, and TLS/connectivity failures without
+displaying a secret. The code and credential must not be recorded, copied into
+source, or entered in any other terminal field.
+
+Ordinary enrollment requires no direct HTTP call, developer tools, temporary
+proxy, or per-enrollment certificate. If a pairing is still pending, Hub keeps
+it active until expiry. After expiry, the owner can choose **Regenerate expired
+pairing**; **Replace terminal** is the explicit action when a valid pending
+code must be invalidated. Hub also provides owner-confirmed credential
+rotation, revocation, replacement, and factory-reset actions.
 
 Secure mode uses only the terminal credential on these AMS paths:
 

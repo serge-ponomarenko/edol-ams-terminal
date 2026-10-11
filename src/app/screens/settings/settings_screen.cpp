@@ -383,6 +383,12 @@ void SettingsScreen::create()
     lv_obj_center(forgetCredentialLabel);
     lv_obj_add_event_cb(forgetCredentialButton, onForgetSecureCredentialClick, LV_EVENT_CLICKED, this);
 
+    enrollmentStatusLabel = lv_label_create(formContainer);
+    lv_obj_set_width(enrollmentStatusLabel, 310);
+    lv_label_set_long_mode(enrollmentStatusLabel, LV_LABEL_LONG_WRAP);
+    lv_obj_set_style_text_font(enrollmentStatusLabel, &lv_font_montserrat_16, 0);
+    lv_obj_align(enrollmentStatusLabel, LV_ALIGN_TOP_LEFT, 5, 340);
+
     // ==========================
     // SPACER
     // ==========================
@@ -396,13 +402,13 @@ void SettingsScreen::create()
     lv_obj_set_size(
         spacer,
         1,
-        190);
+        250);
 
     lv_obj_align(
         spacer,
         LV_ALIGN_TOP_LEFT,
         0,
-        340);
+        400);
 
     // ==========================
     // BACK BUTTON
@@ -750,6 +756,28 @@ void SettingsScreen::updateConnectionStatus(
         lv_label_set_text(
             screen->ipLabel,
             "-");
+    }
+
+    const String &enrollmentError = TerminalEnrollmentService::lastError();
+    if (TerminalEnrollmentService::isBusy())
+    {
+        lv_label_set_text(screen->enrollmentStatusLabel, "Enrollment: contacting AMS...");
+        lv_obj_set_style_text_color(screen->enrollmentStatusLabel, lv_palette_main(LV_PALETTE_YELLOW), 0);
+    }
+    else if (!enrollmentError.isEmpty())
+    {
+        lv_label_set_text_fmt(screen->enrollmentStatusLabel, "Enrollment: %s", enrollmentError.c_str());
+        lv_obj_set_style_text_color(screen->enrollmentStatusLabel, lv_palette_main(LV_PALETTE_RED), 0);
+    }
+    else if (SettingsService::get().secureMode)
+    {
+        lv_label_set_text(screen->enrollmentStatusLabel, "Enrollment complete. Secure terminal is active.");
+        lv_obj_set_style_text_color(screen->enrollmentStatusLabel, lv_palette_main(LV_PALETTE_GREEN), 0);
+    }
+    else
+    {
+        lv_label_set_text(screen->enrollmentStatusLabel, "Enter the Hub pairing code, then choose ENROLL.");
+        lv_obj_set_style_text_color(screen->enrollmentStatusLabel, lv_color_white(), 0);
     }
 }
 
