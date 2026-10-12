@@ -19,6 +19,7 @@ private:
     static unsigned long lastFetch;
 
     static int requestId;
+    static bool authorizationLost;
 
     static inline bool previousPrinting = false;
 };

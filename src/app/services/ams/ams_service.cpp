@@ -3,6 +3,8 @@
 #include "../../../utils/json/json_utils.h"
 
 #include "../../settings/settings_service.h"
+#include "../../navigation/navigation.h"
+#include "../../screens/settings/settings_screen.h"
 #include "../wifi/wifi_service.h"
 #include "../http/http_service.h"
 #include "../terminal/terminal_api.h"
@@ -12,6 +14,7 @@ AmsState AmsService::state;
 
 unsigned long AmsService::lastFetch = 0;
 int AmsService::requestId = -1;
+bool AmsService::authorizationLost = false;
 
 void AmsService::begin()
 {
@@ -19,6 +22,18 @@ void AmsService::begin()
 
 void AmsService::update()
 {
+    if (authorizationLost)
+    {
+        if (SettingsService::get().secureMode && TerminalApi::isReady())
+        {
+            authorizationLost = false;
+        }
+        else
+        {
+            return;
+        }
+    }
+
     if (!WifiService::isConnected())
     {
         return;
@@ -37,10 +52,19 @@ void AmsService::update()
 
         if (!HttpService::isSuccess(requestId))
         {
+            int responseCode = HttpService::getResponseCode(requestId);
             Serial.print(F("AMS request failed: "));
-            Serial.println(HttpService::getResponseCode(requestId));
+            Serial.println(responseCode);
             HttpService::clear(requestId);
             requestId = -1;
+            if (SettingsService::get().secureMode && (responseCode == 401 || responseCode == 403))
+            {
+                TerminalApi::factoryReset();
+                state = AmsState{};
+                previousPrinting = false;
+                authorizationLost = true;
+                Navigation::replace(new SettingsScreen());
+            }
             return;
         }
 

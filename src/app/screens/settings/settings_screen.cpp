@@ -8,6 +8,20 @@
 #include "../../services/terminal/terminal_enrollment_service.h"
 #include "../../services/terminal/terminal_api.h"
 
+namespace {
+const char * PAIRING_KEYBOARD_MAP[] = {
+        "A", "B", "C", "D", "E", "F", "G", "H", "I", LV_SYMBOL_BACKSPACE, "\n",
+        "J", "K", "L", "M", "N", "O", "P", "Q", "R", LV_SYMBOL_OK, "\n",
+        "S", "T", "U", "V", "W", "X", "Y", "Z", ""
+};
+
+const lv_btnmatrix_ctrl_t PAIRING_KEYBOARD_CTRL_MAP[] = {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, LV_KEYBOARD_CTRL_BTN_FLAGS | 1,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, LV_KEYBOARD_CTRL_BTN_FLAGS | 1,
+        1, 1, 1, 1, 1, 1, 1, 1
+};
+}
+
 void SettingsScreen::create()
 {
     root = lv_obj_create(
@@ -374,12 +388,12 @@ void SettingsScreen::create()
         this);
 
     lv_obj_t *pairingCodeLabel = lv_label_create(formContainer);
-    lv_label_set_text(pairingCodeLabel, "Pairing code");
+    lv_label_set_text(pairingCodeLabel, "Pairing code (A-Z)");
     lv_obj_set_style_text_color(pairingCodeLabel, lv_color_white(), 0);
     lv_obj_align(pairingCodeLabel, LV_ALIGN_TOP_LEFT, 10, 270);
 
     pairingCodeInput = lv_textarea_create(formContainer);
-    lv_textarea_set_max_length(pairingCodeInput, 10);
+    lv_textarea_set_max_length(pairingCodeInput, 11);
     lv_obj_set_size(pairingCodeInput, 180, 32);
     lv_obj_align(pairingCodeInput, LV_ALIGN_TOP_LEFT, 5, 290);
     lv_obj_add_event_cb(pairingCodeInput, onTextareaFocused, LV_EVENT_FOCUSED, this);
@@ -500,6 +514,12 @@ void SettingsScreen::create()
     keyboard =
         lv_keyboard_create(root);
 
+    lv_keyboard_set_map(
+        keyboard,
+        LV_KEYBOARD_MODE_USER_1,
+        PAIRING_KEYBOARD_MAP,
+        PAIRING_KEYBOARD_CTRL_MAP);
+
     lv_obj_set_size(
         keyboard,
         LV_PCT(100),
@@ -561,6 +581,10 @@ void SettingsScreen::onTextareaFocused(
 
     lv_obj_t *textarea =
         lv_event_get_target(event);
+
+    lv_keyboard_set_mode(
+        screen->keyboard,
+        textarea == screen->pairingCodeInput ? LV_KEYBOARD_MODE_USER_1 : LV_KEYBOARD_MODE_TEXT_LOWER);
 
     lv_keyboard_set_textarea(
         screen->keyboard,

@@ -9,9 +9,16 @@
 bool TerminalEnrollmentService::start(const String &pairingCode)
 {
     Settings &settings = SettingsService::get();
-    if (requestId >= 0 || pairingCode.length() != 10)
+    String normalizedCode = pairingCode;
+    normalizedCode.toUpperCase();
+    bool lettersOnly = normalizedCode.length() == 11;
+    for (size_t index = 0; lettersOnly && index < normalizedCode.length(); index++)
     {
-        error = "Enter the 10-character pairing code";
+        lettersOnly = normalizedCode[index] >= 'A' && normalizedCode[index] <= 'Z';
+    }
+    if (requestId >= 0 || !lettersOnly)
+    {
+        error = "Enter the 11-letter pairing code";
         return false;
     }
     if (settings.amsHost[0] == '\0' || settings.amsPort <= 0 || settings.amsPort > 65535)
@@ -20,7 +27,7 @@ bool TerminalEnrollmentService::start(const String &pairingCode)
         return false;
     }
     String url = TerminalApi::url("/api/terminal/v1/enroll");
-    String body = "{\"pairingCode\":\"" + pairingCode + "\"}";
+    String body = "{\"pairingCode\":\"" + normalizedCode + "\"}";
     requestId = HttpService::post(url, body);
     if (requestId < 0)
     {
